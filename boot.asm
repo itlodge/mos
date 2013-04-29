@@ -17,7 +17,7 @@ display:
 	mov 	dl, 0
 	int 	10h
 	ret
-	
+ 	
 BOOT_MESSAGE:	db	"MOS, my first operating system!"
 LENGTH:		db	32
 
