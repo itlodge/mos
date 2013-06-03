@@ -10,17 +10,33 @@
 
 # echo "" | bochs
 
-if [ -f "pm.img" ]; then
-    rm pm.img
+function simu()
+{
+    if [ -f "pm.img" ]; then
+	rm pm.img
+    fi
+    bximage -fd -size=1.44 -q pm.img
+    echo "abc" | sudo -S losetup /dev/loop0 pm.img
+    sudo mkfs.ntfs /dev/loop0
+    sudo losetup -d /dev/loop0
+
+    echo "" | bochs&
+}
+
+function com()
+{
+    nasm pmtest.asm -o pmtest.com
+
+    sudo mount -t tmpfs -o loop pm.img /mnt/
+    sudo cp pmtest.com /mnt/
+    sudo umount /mnt
+}
+
+if [ "$1" == "simu" ]; then
+    simu
+elif [ "$1" == "com" ]; then
+    com
 fi
-bximage -fd -size=1.44 -q pm.img
-echo "" | bochs&
 
-nasm pmtest.asm -o pmtest.com
-
-sudo mount -o loop pm.img /mnt/
-sudo rm -r /mnt/*
-sudo cp pmtest.com /mnt/
-sudo umount /mnt
 
 
