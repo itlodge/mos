@@ -1,2 +1,8 @@
+doc/
+test/
 *.pdf
 *.eg
+*.log
+*.img
+*.bin
+*.o
