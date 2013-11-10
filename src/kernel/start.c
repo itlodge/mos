@@ -3,12 +3,6 @@
 #include "protect.h"
 
 // Global variables
-uint8 gdt_ptr[DT_PTR_LEN];            // gdt_ptr is set in kernel.asm
-Descriptor gdt[GDT_SIZE];
-
-uint8 idt_ptr[DT_PTR_LEN];           // idt_ptr is set in kernel.asm
-Gate idt[IDT_SIZE];
-
 int disp_pos = 0;
 
 // Global functions
@@ -25,7 +19,7 @@ init_protect();
 void
 cstart()
 {
-    disp_str("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n---Begin---\n");
+    disp_str("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
     // Change GDT
     memcpy(&gdt, (void *)(*(uint32 *)(&gdt_ptr[2])),
@@ -44,8 +38,6 @@ cstart()
     *idt_base = (uint32)&idt;
 
     init_protect();
-
-    disp_str("-----end-------\n");
 }
 
     

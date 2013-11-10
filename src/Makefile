@@ -8,13 +8,14 @@ ENTRY_POINT = 0x30400
 BOOT_PATH = boot
 KERNEL_PATH = kernel
 LIB_PATH = lib
+INCLUDE_PATH = include
 
-# 
+# Tools and flags
 ASM = nasm
 CC = gcc
 LD = ld
-ASM_DOS_FLAGS = -I $(BOOT_PATH)/include/
-ASM_ELF_FLAGS = -I $(BOOT_PATH)/include/ -f elf
+ASM_DOS_FLAGS = -I $(BOOT_PATH)/include/ -I ./
+ASM_ELF_FLAGS = -I $(INCLUDE_PATH)/ -f elf
 C_FLAGS = -I include -c -fno-builtin -m32 -std=c99
 LD_FLAGS = -s -m elf_i386 -Ttext $(ENTRY_POINT)
 
@@ -22,9 +23,11 @@ BOOT_SRC = $(BOOT_PATH)/boot.asm
 
 LOADER_SRC = $(BOOT_PATH)/loader.asm 
 
-KERNEL_SRC = $(KERNEL_PATH)/kernel.asm $(LIB_PATH)/klib.asm 
+KERNEL_SRC = $(KERNEL_PATH)/kernel.asm $(KERNEL_PATH)/syscall.asm \
+	$(LIB_PATH)/klib.asm
 KERNEL_C = $(KERNEL_PATH)/start.c $(KERNEL_PATH)/i8259.c \
-	$(KERNEL_PATH)/protect.c $(LIB_PATH)/klibc.c
+	$(KERNEL_PATH)/protect.c $(LIB_PATH)/klibc.c $(KERNEL_PATH)/main.c \
+	$(KERNEL_PATH)/clock.c $(KERNEL_PATH)/process.c
 
 KERNEL_OBJS = $(KERNEL_SRC:.asm=.o)
 KERNEL_CO = $(KERNEL_C:.c=.o)

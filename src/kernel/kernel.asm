@@ -1,14 +1,28 @@
-
-SELECTOR_KERNEL_CS      equ     8
-
+%include "const.inc"
+        
+;; functions
 extern  cstart
 extern  exception_handler
 extern  spurious_irq
+extern  kernel_main
+extern  disp_str
+extern  clock_handler
         
+;; variables
 extern  gdt_ptr
 extern  idt_ptr
 extern  disp_pos
+extern  proc_ready
+extern  tss
+extern  reenter_cnt
+extern  irq_table
+extern  sys_call_table
         
+bits 32
+
+[section .data]
+clock_msg       db      "^", 0
+
 [section .bss]
 StackSpace      resb    2 * 1024
 StackTop:       
@@ -16,6 +30,8 @@ StackTop:
 [section .text]
 global _start
 
+global  restart
+        
 global  divide_error
 global  single_step_exception
 global  nmi
@@ -33,6 +49,8 @@ global  general_protection
 global  page_fault
 global  copr_error
 
+global  sys_call
+        
 global  hwint00
 global  hwint01
 global  hwint02
@@ -63,21 +81,40 @@ _start:
         
         jmp     SELECTOR_KERNEL_CS:cs_init
 cs_init:
-        sti
-        hlt
-
-;; Hardware interrupt
+        xor     eax, eax
+        mov     ax, SELECTOR_TSS
+        ltr     ax              ; Load to TR register
+        jmp     kernel_main
+        
+;; Master a hardware interrupt
 %macro  hwint_master    1
+        call    save
+        ;; Masking the interrupt
+        in      al, INT_M_CTLMASK
+        or      al, (1 << %1)
+        out     INT_M_CTLMASK, al
+
+        mov     al, EOI
+        out     INT_M_CTL, al
+
+        sti                     ; Reenable, for new interrupt
         push    %1
-        call    spurious_irq
-        add     esp, 4
-        hlt
+        call    [irq_table + 4 * %1]
+        pop     ecx
+        cli
+
+        ;; Recover, now can accept interrupt
+        in      al, INT_M_CTLMASK
+        and     al, ~(1 << %1)
+        out     INT_M_CTLMASK, al
+        
+        ret
 %endmacro
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
         hwint_master    0
-
+        
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)
         hwint_master    1
@@ -214,3 +251,53 @@ exception:
         add     esp, 4 * 2
         hlt
 
+save:   
+        pushad
+        push    ds
+        push    es
+        push    fs
+        push    gs
+        mov     dx, ss
+        mov     ds, dx
+        mov     es, dx
+
+        mov     esi, esp
+        
+        inc     dword [reenter_cnt]
+        cmp     dword [reenter_cnt], 0
+        jne     .reenter
+
+        mov     esp, StackTop
+
+        push    restart
+        jmp     [esi + RETADDR - STACK_BASE]
+.reenter:
+        push    restart_reenter
+        jmp     [esi + RETADDR - STACK_BASE]
+        
+restart:
+        mov     esp, [proc_ready]
+        lldt    [esp + LDT_SEL]
+        lea     eax, [esp + STACK_TOP]
+        mov     dword [tss + TSS3_S_SP0], eax
+
+restart_reenter:
+        dec     dword [reenter_cnt]
+        pop     gs
+        pop     fs
+        pop     es
+        pop     ds
+        popad
+        add     esp, 4
+        iretd
+
+sys_call:
+        call    save
+
+        sti
+        call    [sys_call_table + eax * 4]
+        mov     [esi + EAX_REG - STACK_BASE], eax
+        cli
+
+        ret
+        

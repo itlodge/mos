@@ -1,4 +1,4 @@
-
+%include "const.inc"
 
 extern disp_pos
         
@@ -43,6 +43,64 @@ memcpy:
         pop     ebp
         ret
 
+;; ------------------------------------------
+;; void memset(void *dst, char ch, int size);
+;; -------------------------------------------
+global  memset
+
+memset:
+        push    ebp
+        mov     ebp, esp
+
+        push    esi
+        push    edi
+        push    ecx
+
+        mov     edi, [ebp + 8]
+        mov     edx, [ebp + 12]
+        mov     ecx, [ebp + 16]
+.begin:
+        cmp     ecx, 0
+        jz      .end
+
+        mov     byte [edi], dl
+        inc     edi
+
+        dec     ecx
+        jmp     .begin
+.end:
+        pop     ecx
+        pop     edi
+        pop     esi
+        mov     esp, ebp
+        pop     ebp
+        ret
+
+;; --------------------------------------------
+;; char *strcpy(char *dst, const char *src);
+;; --------------------------------------------
+global strcpy
+
+strcpy:
+        push    ebp
+        mov     ebp, esp
+
+        mov     esi, [ebp + 12]
+        mov     edi, [ebp + 8]
+.begin:
+        mov     al, [esi]
+        inc     esi
+
+        mov     byte [edi], al
+        inc     edi
+
+        cmp     al, 0
+        jnz     .begin
+
+        mov     eax, [ebp + 8]
+        pop     ebp
+        ret
+        
 ;; ---------------------------------------------
 ;; void disp_str(const char *str);
 ;; ---------------------------------------------
@@ -67,7 +125,7 @@ disp_str:
         push    eax
         mov     eax, edi        ; EAX, the position to be changed
         mov     bl, 160         ; 2 * 80 = 160
-        div     bl,             ; 8-bit division, AL will hold the line num
+        div     bl              ; 8-bit division, AL will hold the line num
         and     eax, 0FFh       ; Now EAX only contains AL
         inc     eax             ; To the next line
 
@@ -161,6 +219,68 @@ int_byte:
         in      al, dx
         nop
         nop
+        ret
+        
+;; --------------------------------------------
+;; void disable_irq(int irq);
+;; --------------------------------------------
+global disable_irq
+        
+disable_irq:
+        mov     ecx, [esp + 4]
+        pushf
+        cli
+        mov     ah, 1
+        rol     ah, cl          ; ah = (1 << (irq % 8))
+        cmp     cl, 8
+        jae     .disable_8
+.disable_0:
+        in      al, INT_M_CTLMASK
+        test    al, ah
+        jnz     .already
+        or      al, ah
+        out     INT_M_CTLMASK, al
+        popf
+        mov     eax, 1
+        ret
+.disable_8:
+        in      al, INT_S_CTLMASK
+        test    al, ah
+        jnz     .already
+        or      al, ah
+        out     INT_S_CTLMASK, al
+        popf
+        mov     eax, 1
+        ret
+.already:
+        popf
+        xor     eax, eax
+        ret
+        
+;; -------------------------------------
+;; void enable_irq(int irq);
+;; -------------------------------------
+global enable_irq
+
+enable_irq:
+        mov     ecx, [esp + 4]
+        pushf
+        cli
+        mov     ah, ~1
+        rol     ah, cl
+        cmp     cl, 8
+        jae     .enable_8
+.enable_0:
+        in      al, INT_M_CTLMASK
+        and     al, ah
+        out     INT_M_CTLMASK, al
+        popf
+        ret
+.enable_8:
+        in      al, INT_S_CTLMASK
+        and     al, ah
+        out     INT_S_CTLMASK, al
+        popf
         ret
         
         

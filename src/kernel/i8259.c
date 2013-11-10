@@ -10,6 +10,12 @@ disp_str(const char *str);
 extern void
 out_byte(uint16 port, uint8 value);
 
+// External variables
+extern irq_handler irq_table[IRQ_NUM];
+
+void
+spurious_irq(int irq);
+
 void
 init_8259A()
 {
@@ -38,10 +44,14 @@ init_8259A()
     out_byte(INT_S_CTLMASK, 0x1);
 
     // OCW1, Master
-    out_byte(INT_M_CTLMASK, 0xFD);  // Trigger keyboard interrupt
+    out_byte(INT_M_CTLMASK, 0xFF);  // Trigger clock interrupt
 
     // OCW1, Slave
     out_byte(INT_S_CTLMASK, 0xFF);
+
+    for (int i = 0; i < IRQ_NUM; ++i) {
+        irq_table[i] = spurious_irq;
+    }
 }
 
 void
@@ -50,4 +60,11 @@ spurious_irq(int irq)
     disp_str("spurious_irq: ");
     disp_int(irq);
     disp_str("\n");
+}
+
+void
+put_irq_handler(int irq, irq_handler handler)
+{
+    disable_irq(irq);
+    irq_table[irq] = handler;
 }
