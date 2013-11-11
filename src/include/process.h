@@ -4,9 +4,10 @@
 #include "type.h"
 #include "protect.h"
 
+#define STACK_SIZE_TTY 0x8000
 #define STACK_SIZE_A 0x8000
 #define STACK_SIZE_B 0x8000
-#define STACK_SIZE_TOTAL (STACK_SIZE_A + STACK_SIZE_B)
+#define STACK_SIZE_TOTAL (STACK_SIZE_TTY + STACK_SIZE_A + STACK_SIZE_B)
 
 typedef struct StackFrame {
     uint32 gs;

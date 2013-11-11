@@ -211,9 +211,9 @@ out_byte:
 ;; -------------------------------------------
 ;; uint8 in_byte(uint16 port);
 ;; -------------------------------------------
-global int_byte
+global in_byte
         
-int_byte:
+in_byte:
         mov     edx, [esp + 4]  ; Port
         xor     eax, eax
         in      al, dx
@@ -283,4 +283,21 @@ enable_irq:
         popf
         ret
         
+;; ------------------------------------------
+;; void disable_int();   // Disable interrupt
+;; ------------------------------------------
+global disable_int
+
+disable_int:
+        cli
+        ret
+
+;; ------------------------------------------
+;; void enable_int();   // Enable interrupt
+;; ------------------------------------------
+global enable_int
+
+enable_int:
+        sti
+        ret
         

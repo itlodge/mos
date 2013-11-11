@@ -2,7 +2,7 @@
 #define _CONST_H_
 
 #define NAME_LEN 20
-#define PROCESS_NUM 2
+#define PROCESS_NUM 3
 #define IRQ_NUM 16
 #define SYS_CALL_NUM 1
 

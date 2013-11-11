@@ -6,8 +6,17 @@ extern Process proc_list[PROCESS_NUM];
 extern void
 disp_str(const char *str);
 
+extern void
+out_byte(uint16 port, uint8 value);
+
+extern void
+enable_irq(int irq);
+
 extern int
 get_ticks();
+
+extern void
+put_irq_handler(int irq, irq_handler handler);
 
 extern int ticks;
 
@@ -37,4 +46,16 @@ milli_delay(int ms)
             break;
         }
     }
+}
+
+void
+init_clock()
+{
+    // Initialize 8253 PIT
+    out_byte(TIMER_MODE, RATE_GENERATOR);
+    out_byte(TIMER0, (uint8)(TIMER_FREQ / TIMER_HZ));
+    out_byte(TIMER0, (uint8)((TIMER_FREQ / TIMER_HZ) >> 8));
+    
+    put_irq_handler(CLOCK_IRQ, clock_handler);
+    enable_irq(CLOCK_IRQ);
 }

@@ -25,14 +25,20 @@ extern void
 enable_irq(int irq);
 
 // from C files
-extern void
-put_irq_handler(int irq, irq_handler handler);
-
-extern void
-clock_handler(int irq);
-
 extern int
 get_ticks();
+
+extern void
+init_keyboard();
+
+extern void
+init_clock();
+
+extern void
+milli_delay(int t);
+
+extern void
+task_tty();
 
 // External variables
 extern Process proc_list[PROCESS_NUM];
@@ -44,7 +50,8 @@ testA();
 void
 testB();
 
-Task task_list[PROCESS_NUM] = {{testA, STACK_SIZE_A, "testA"},
+Task task_list[PROCESS_NUM] = {{task_tty, STACK_SIZE_TTY, "tty"},
+                               {testA, STACK_SIZE_A, "testA"},
                                {testB, STACK_SIZE_B, "testB"}};
 
 int
@@ -90,13 +97,8 @@ kernel_main()
     reenter_cnt = 0;
     proc_ready = proc_list;
 
-    // Initialize 8253 PIT
-    out_byte(TIMER_MODE, RATE_GENERATOR);
-    out_byte(TIMER0, (uint8)(TIMER_FREQ / TIMER_HZ));
-    out_byte(TIMER0, (uint8)((TIMER_FREQ / TIMER_HZ) >> 8));
-    
-    put_irq_handler(CLOCK_IRQ, clock_handler);
-    enable_irq(CLOCK_IRQ);
+    init_clock();
+    init_keyboard();
     
     restart();
 
@@ -107,7 +109,7 @@ void
 testA()
 {
     while (1) {
-        disp_str("A ");
+        //        disp_str("A ");
         milli_delay(300);
     }
 }
@@ -116,7 +118,7 @@ void
 testB()
 {
     while (1) {
-        disp_str("B ");
+        //        disp_str("B ");
         milli_delay(300);
     }
 }

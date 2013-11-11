@@ -27,7 +27,8 @@ KERNEL_SRC = $(KERNEL_PATH)/kernel.asm $(KERNEL_PATH)/syscall.asm \
 	$(LIB_PATH)/klib.asm
 KERNEL_C = $(KERNEL_PATH)/start.c $(KERNEL_PATH)/i8259.c \
 	$(KERNEL_PATH)/protect.c $(LIB_PATH)/klibc.c $(KERNEL_PATH)/main.c \
-	$(KERNEL_PATH)/clock.c $(KERNEL_PATH)/process.c
+	$(KERNEL_PATH)/clock.c $(KERNEL_PATH)/process.c \
+	$(KERNEL_PATH)/keyboard.c $(KERNEL_PATH)/tty.c
 
 KERNEL_OBJS = $(KERNEL_SRC:.asm=.o)
 KERNEL_CO = $(KERNEL_C:.c=.o)

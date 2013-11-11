@@ -27,7 +27,7 @@ uitoa(char *str, int n)
             if (!is_zero || c > 0) {
                 is_zero = false;
                 if (c > 9) {
-                    c = 'A' + 10 - c;
+                    c = 'A' + c - 10;
                 } else {
                     c += '0';
                 }
