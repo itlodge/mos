@@ -84,6 +84,9 @@ kernel_main()
         ++task;
         selector_ldt += (1 << 3);
     }
+    proc_list[0].ticks = proc_list[0].priority = 150;
+    proc_list[1].ticks = proc_list[1].priority = 50;
+    
     reenter_cnt = 0;
     proc_ready = proc_list;
 
@@ -104,10 +107,8 @@ void
 testA()
 {
     while (1) {
-        disp_str("A");
-        disp_int(get_ticks());
-        disp_str(".");
-        milli_delay(1000);
+        disp_str("A ");
+        milli_delay(300);
     }
 }
 
@@ -115,9 +116,7 @@ void
 testB()
 {
     while (1) {
-        disp_str("B");
-        disp_int(get_ticks());
-        disp_str(".");
-        milli_delay(1000);
+        disp_str("B ");
+        milli_delay(300);
     }
 }

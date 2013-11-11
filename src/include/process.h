@@ -34,6 +34,8 @@ typedef struct Process {
     uint16 ldt_sel;     // LDT selector
     Descriptor ldts[LDT_SIZE];
     uint32 pid;         // Process id
+    int ticks;
+    int priority;
     const char name[NAME_LEN];
 } Process;
 
@@ -43,8 +45,13 @@ typedef struct Task {
     const char name[NAME_LEN];
 } Task;
 
+// Public variables
 Process *proc_ready;
 Process proc_list[PROCESS_NUM];
+
+// Public functions
+void
+schedule();
 
 #endif /* _PROCESS_H_ */
     

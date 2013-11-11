@@ -14,17 +14,16 @@ extern int ticks;
 void
 clock_handler(int irq)
 {
-    disp_str("#");
     ++ticks;
+    --proc_ready->ticks;
     
     if (reenter_cnt != 0) {
-        disp_str("!");
         return;
     }
-    ++proc_ready;
-    if (proc_ready >= proc_list + PROCESS_NUM) {
-        proc_ready = proc_list;
+    if (proc_ready->ticks > 0) {
+        return;
     }
+    schedule();
 }
 
 void
