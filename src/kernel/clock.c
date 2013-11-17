@@ -1,16 +1,8 @@
 #include "process.h"
+#include "extern.h"
 
 extern Process *proc_ready;
-extern Process proc_list[PROCESS_NUM];
-
-extern void
-disp_str(const char *str);
-
-extern void
-out_byte(uint16 port, uint8 value);
-
-extern void
-enable_irq(int irq);
+extern Process proc_list[PROCESS_NUM + TASK_NUM];
 
 extern int
 get_ticks();

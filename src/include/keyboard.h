@@ -103,6 +103,8 @@
 
 #define KB_DATA 0x60
 #define KB_CMD 0x64
+#define KB_ACK 0xFA
+#define LED_CODE 0xED
 
 #define KB_MAX_SIZE 30   // Bytes
 
@@ -113,7 +115,12 @@ typedef struct KbBuf {
     char buf[KB_MAX_SIZE];
 } KbBuf;
 
+struct Tty;
+
 void
-keyboard_read();
+keyboard_read(struct Tty *tty);
+
+void
+keyboard_write(struct Tty *tty);
 
 #endif /* _KEYBOARD_H_ */

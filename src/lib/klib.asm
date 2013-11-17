@@ -101,6 +101,27 @@ strcpy:
         pop     ebp
         ret
         
+;; --------------------------------------------
+;; int strlen(char *str);
+;; --------------------------------------------
+global strlen
+
+strlen:
+        push    ebp
+        mov     ebp, esp
+
+        mov     eax, 0
+        mov     esi, [ebp + 8]
+.begin:
+        cmp     byte [esi], 0
+        jz      .end
+        inc     esi
+        inc     eax
+        jmp     .begin
+.end
+        pop     ebp
+        ret
+        
 ;; ---------------------------------------------
 ;; void disp_str(const char *str);
 ;; ---------------------------------------------

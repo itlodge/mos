@@ -2,9 +2,11 @@
 #define _CONST_H_
 
 #define NAME_LEN 20
-#define PROCESS_NUM 3
+#define TASK_NUM 1
+#define PROCESS_NUM 2
 #define IRQ_NUM 16
-#define SYS_CALL_NUM 1
+#define SYS_CALL_NUM 2
+#define CONSOLE_NUM 3
 
 #define CLOCK_IRQ       0
 #define KEYBOARD_IRQ    1
@@ -16,5 +18,10 @@
 #define FLOPPY_IRQ      6       /* floppy disk */
 #define PRINTER_IRQ     7
 #define AT_WINI_IRQ     14      /* at winchester */
+
+#define DEFAULT_CHAR_COLOR 0x07
+
+#define SCREEN_WIDTH 80
+#define SCREEN_SIZE (80 * 25)
 
 #endif /* _CONST_H_ */

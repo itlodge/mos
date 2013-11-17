@@ -7,7 +7,7 @@ disp_str(const char *str);
  * convert a 32-bit unsinged integer N into hex string STR,
  * and return the string.
  */
-static char *
+char *
 uitoa(char *str, int n)
 {
     char *p = str;

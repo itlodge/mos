@@ -1,16 +1,10 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
+#include "extern.h"
 
 // Global variables
 int disp_pos = 0;
-
-// Global functions
-void *
-memcpy(void *dest, void *src, uint32 size);
-
-void
-disp_str(const char *str);
 
 // Extern
 extern void

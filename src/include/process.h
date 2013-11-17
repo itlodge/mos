@@ -38,6 +38,7 @@ typedef struct Process {
     int ticks;
     int priority;
     const char name[NAME_LEN];
+    uint8 tty;
 } Process;
 
 typedef struct Task {
@@ -48,7 +49,7 @@ typedef struct Task {
 
 // Public variables
 Process *proc_ready;
-Process proc_list[PROCESS_NUM];
+Process proc_list[PROCESS_NUM + TASK_NUM];
 
 // Public functions
 void

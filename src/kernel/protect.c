@@ -1,32 +1,18 @@
 #include "protect.h"
 #include "process.h"
+#include "extern.h"
 
-#define SCREEN_WIDTH 80
-
-extern int disp_pos;
 extern Gate idt[IDT_SIZE];
 extern Process *proc_ready;
-extern Process proc_list[PROCESS_NUM];
+extern Process proc_list[PROCESS_NUM + TASK_NUM];
                  
 extern void
 init_8259A();
 
 extern int
 sys_get_ticks();
-
-// External functions from ASM
-extern void
-disp_int(int n);
-
-extern void
-disp_str(const char *str);
-
-extern void
-disp_color_str(const char *str, int color);
-
-extern void
-memset(void *dst, char ch, int size);
-
+extern int
+sys_write(char *buf, int len, Process proc);
 
 // From kernel.asm
 void divide_error();
@@ -180,6 +166,7 @@ init_protect()
     init_idt_vector(INT_VECTOR_SYS_CALL, DA_386IGate,
                     sys_call, PRIVILEGE_USER);
     sys_call_table[0] = sys_get_ticks;
+    sys_call_table[1] = sys_write;
     
     // Put tss into GDT
     memset(&tss, 0, sizeof(tss));
@@ -192,7 +179,7 @@ init_protect()
     // Put LDT into GDT
     Process *p = proc_list;
     uint16 selector_ldt = INDEX_LDT_FIRST << 3;
-    for (int i = 0; i < PROCESS_NUM; ++i) {
+    for (int i = 0; i < PROCESS_NUM + TASK_NUM; ++i) {
         init_desc(&gdt[selector_ldt >> 3],
                   vir2phy(seg2phy(SELECTOR_KERNEL_DS), proc_list[i].ldts),
                   LDT_SIZE * sizeof(Descriptor) - 1, DA_LDT);

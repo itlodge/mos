@@ -123,3 +123,5 @@ Typo
 * p140, code list 5.22, line 718, comment "OffsetOfKernel" should be
 "BaseOfKernel"
    
+* p284, code list 7.44, line 339, ``kb_read =! KB_ACK`` should be
+``kb_read != KB_ACK``.

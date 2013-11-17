@@ -1,17 +1,6 @@
 #include "type.h"
 #include "protect.h"
-
-extern void
-disp_int(int n);
-
-extern void
-disp_str(const char *str);
-
-extern void
-out_byte(uint16 port, uint8 value);
-
-extern void
-disable_irq(int irq);
+#include "extern.h"
 
 // External variables
 extern irq_handler irq_table[IRQ_NUM];
